@@ -1,0 +1,1579 @@
+# ds and cs address of each token	
+global csAddress 
+global dsAddress 
+global symbolArr
+global symbolArrIndex
+
+procedure main()
+	# ask for the source code location
+	writes("Please enter the name of the source code: ")
+	
+	# make sure we get the source code
+	while not(srcCode := open(read())) do
+		writes("Cannot open the file. Please re-enter the file's name: ")
+		
+	# prepare the token list and symbol table
+	tokenList := open("token_list.txt", "c")
+	write(tokenList, left("Token", 25) || "Classification")
+	
+	symbolTable := open("symbol_table.txt", "c")
+	write(symbolTable, left("Token", 25) || left("Classification", 25) || left("Value", 10) || left("Address", 10) || "Segment")
+
+	# initialize csAddress and dsAddress to -2 so we only
+	# need to increment it by 2 everytime
+	csAddress := -2
+	dsAddress := -2
+
+	# initialize the symbol array with a 1000 empty space
+	symbolArr := list(1000, "")
+	symbolArrIndex := 1
+	
+	# read the file
+	while line := read(srcCode) do
+	{	
+		# skip if it is an empty line
+		if *line > 0 then
+		{
+			# seacrh for key word in the string first
+			# then we look at the reamaining of the string
+			getKeyword(line, tokenList, symbolTable)
+		}
+	}
+	
+	# close the files
+	close(srcCode)
+	close(symbolTable)
+	close(tokenList)
+end
+
+# check if a token is already existed in the symbol table
+procedure ifExisted(token)
+	# check if the symbol is in the symbolArr
+	every i := 1 to *symbolArr do
+	{
+		if token === symbolArr[i] then
+			return "true"
+	}
+	
+	# add it to the array
+	symbolArr[symbolArrIndex] := token
+	symbolArrIndex := symbolArrIndex + 1
+	return "false"
+end
+
+# slice the string start from first to last
+procedure slice(string, first, last)
+	string ?
+	{
+		tab(first + last)
+		temp := tab(0)
+		# if the sliced word is at the start of the string then we can just return the rest of the string
+		if first == 1 then
+			return temp
+		# if it is not then we need to concatinate the part before the sliced word
+		else
+		{
+			temp := string[1 : first] || temp
+			return temp
+		}
+	}
+end
+
+# find the keyword in the source code so we
+# can save time processing the file
+procedure getKeyword(line, tokenList, symbolTable)
+	# an array to store all the keywords
+	keyArr := ["CLASS", "CONST", "PROCEDURE", "WHILE", "IF", "ELSE", "CALL", "VAR", "ODD", "NO KEY WORD", "GET", "PUT"]
+
+	noKeyword := 1
+	
+	# loop through the array
+	every i := 1 to *keyArr do
+	{
+		# if we found a keyword then slice the keyword out of the string
+		# get the index of the first letter in the keyword then add with its length
+		# this will give us the index of where to slice the string
+		if index := find(keyArr[i] , line) then
+		{
+			case i of
+			{
+				# CLASS 
+				1:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state1(sliceString, tokenList, symbolTable)
+					}
+					else
+						state1(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+
+				# CONST 
+				2:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state2(sliceString, tokenList, symbolTable)
+					}
+					else
+						state2(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+
+				# PROCEDURE 
+				3:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state3(sliceString, tokenList, symbolTable)
+					}
+					else
+						state3(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				
+				# WHILE 
+				4:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state4(sliceString, tokenList, symbolTable)
+					}
+					else
+						state4(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				
+				# IF 
+				5:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state5(sliceString, tokenList, symbolTable)
+					}
+					else
+						state5(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				
+				# ELSE 
+				6:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state6(sliceString, tokenList, symbolTable)
+					}
+					else
+						state6(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+
+				# CALL 
+				7:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state7(sliceString, tokenList, symbolTable)
+					}
+					else
+						state7(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+
+				# VAR 
+				8:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state8(sliceString, tokenList, symbolTable)
+					}
+					else
+						state8(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				
+				# ODD 
+				9:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state9(sliceString, tokenList, symbolTable)
+					}
+					else
+						state9(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				# GET 
+				11:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state11(sliceString, tokenList, symbolTable)
+					}
+					else
+						state11(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}
+				# PUT 
+				12:
+				{
+					# only write to the token list if the keyword is at the start of the sentence
+					if index == 1 then
+					{
+						# write the keyword to the token list
+						write(tokenList, left(keyArr[i], 25) || "<" || keyArr[i] || ">")
+
+						# now we slice the keyword from the line and process the token in it
+						sliceString := slice(line, index, *keyArr[i])
+
+						state12(sliceString, tokenList, symbolTable)
+					}
+					else
+						state12(line, tokenList, symbolTable)
+
+					noKeyword := 0
+
+					# stop looking for keyword
+					break
+				}				
+			}
+		}
+	}
+
+	if noKeyword == 1 then
+		state10(line, tokenList, symbolTable)
+end
+
+# check if a token is a num lit or string
+procedure checkType(token)
+	# check it start with a quote
+	if index := find("\"", token) then
+	{
+		sliceString := slice(token, index, 2)
+		
+		# check if it has the closing quote
+		if find("\"", sliceString) then
+			return "<Lit>"
+	}
+	else
+	{
+		digit := [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+		every i := 1 to *digit do
+			if find(digit[i], token) then
+				return "<NumLit>"
+	}
+end
+
+# check if a token is a delimiter or not
+procedure checkDelimiter(token)
+	delimiter := ["!=", "==", ">", ">=", "<", "<=", "+", "-", "*", "/", "="]
+	every i := 1 to *delimiter do
+	{
+		if find(delimiter[i], token) then
+		{
+			case i of
+			{
+				7:
+					return "<ADD>"
+				8:
+					return "<ADD>"
+				9:
+					return "<MULT>"
+				10:
+					return "<MULT>"
+				11:
+					return "<$assign>"
+				default:
+					return "<Delimiter>"
+			}	
+		}
+	}
+end
+
+procedure processToken(token, tokenList, symbolTable, state)
+	# the corresponding keyword with the current state
+	key := ""
+	type := ""
+
+	case state of
+	{
+		4:
+		{
+			key := "DO"
+			type := "<$var>"
+		}
+
+		5:
+		{
+			key := "THEN"
+			type := "<$var>"
+		}
+
+		7:
+		{
+			key := "CALL"
+			type := "<ProcedureName>"
+		}
+		
+		11:
+		{
+			key := "GET"
+			type := "<$var>"
+		}
+		
+		12:
+		{
+			key := "PUT"
+			type := "<$var>"
+		}
+		
+		default:
+			key := ""
+	}
+
+	# check the type of the token
+	if checkDelimiter(token) == "<ADD>" then
+	{
+		# write to tokenList
+		write(tokenList, left(token, 25) || checkDelimiter(token))
+	}
+	else if checkDelimiter(token) == "<MULT>" then
+	{
+		# write to tokenList
+		write(tokenList, left(token, 25) || checkDelimiter(token))
+	}
+	else if checkDelimiter(token) == "<$assign>" then
+	{
+		# write to tokenList
+		write(tokenList, left(token, 25) || checkDelimiter(token))
+	}
+	else if checkDelimiter(token) == "<Delimiter>" then
+	{
+		# write to tokenList
+		write(tokenList, left(token, 25) || checkDelimiter(token))
+	}
+	else
+	{	
+		if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+		{
+			# increment the dsAddress
+			dsAddress := dsAddress + 2	
+
+			# write to tokenList
+			write(tokenList, left(token, 25) || checkType(token))
+
+			# check if the token is already written in the symbol table
+			if ifExisted(token) == "false" then
+				# write to symbolTable
+				write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+		}
+		else
+		{
+			# look for keyword
+			if token == key then
+			{
+				# write to tokenList
+				write(tokenList, left(token, 25) || "<" || key || ">")
+			}
+			else
+			{						
+				# write to tokenList
+				write(tokenList, left(token, 25) || type)
+			}
+		}
+	}
+end
+
+# state 1 CLASS
+procedure state1(string, tokenList, symbolTable)
+	token := ""
+
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			" ":
+			{
+				if *token > 0 then
+					if token := "PROCEDURE" then
+						# write to tokenList
+						write(tokenList, left(token, 25) || "<PROCEDURE>")
+
+				token := ""
+			}
+
+			"{":
+			{
+				
+				# if the token is not empty then we write to the symbol table and token list
+				if *token > 0 then
+				{
+					# increment the csAddress
+					csAddress := csAddress + 2	
+					
+					# write to tokenList
+					write(tokenList, left(token, 25) || "<ProgramName>")
+
+					# write to symbolTable
+					write(symbolTable, left(token, 25) || left("<ProgramName>", 25) || left("0", 10) || left(csAddress, 10) || "CS")
+
+					# then write to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+				}
+				else
+					# then write to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+
+	# if we haven't write the program name make sure to write it
+	if *token > 0 then
+	{
+		# increment the csAddress
+		csAddress := csAddress + 2	
+
+		# write to tokenList
+		write(tokenList, left(token, 25) || "<ProgramName>")
+
+		# write to symbolTable
+		write(symbolTable, left(token, 25) || left("<ProgramName>", 25) || left("0", 10) || left(csAddress, 10) || "CS")
+	}
+end 
+
+# state 2 CONST
+procedure state2(string, tokenList, symbolTable)
+	token := ""			
+
+	lastToken := ""
+
+	assginFlag := 0
+
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			" ":
+			{
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					if token ~== "CONST" then
+						# write to tokenList as $var
+						write(tokenList, left(token, 25) || "<$var>")
+					else
+						write(tokenList, left(token, 25) || "<CONST>")
+				}
+
+				# reset the token
+				token := ""
+			}
+
+			",":
+			{
+				# increment the dsAddress
+				dsAddress := dsAddress + 2		
+
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					# if we the assginFlag is on the it is a Num Lit
+					if assginFlag := 1 then
+						# write to tokenList
+						write(tokenList, left(token, 25) || "<NumLit>")
+					else
+						# write to tokenList
+						write(tokenList, left(token, 25) || "<$var>")
+				}
+
+				# write the  ,
+				write(tokenList, left(",", 25) || "<Comma>")
+
+				# write to symbolTable
+				write(symbolTable, left(lastToken, 25) || left("<CONST>", 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+
+				assginFlag := 0
+
+				# reset the token
+				token := ""
+			}
+
+			";":
+			{
+				# increment the dsAddress
+				dsAddress := dsAddress + 2		
+
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					# if we the assginFlag is on the it is a Num Lit
+					if assginFlag := 1 then
+						# write to tokenList as NumLit
+						write(tokenList, left(token, 25) || "<NumLit>")
+					else
+						# write to tokenList as $var
+						write(tokenList, left(token, 25) || "<$var>")
+				}
+
+				# write the  ;
+				write(tokenList, left(";", 25) || "<Delimiter>")
+
+				# write to symbolTable the program name
+				write(symbolTable, left(lastToken, 25) || left("<CONST>", 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+
+				assginFlag := 0
+
+				# reset the token
+				token := ""
+			}
+
+			"=":
+			{
+				assginFlag := 1
+
+				# write the  =
+				write(tokenList, left("=", 25) || "<$assign>")
+			}
+
+			default:
+			{
+				token := token || string[i]
+
+				if assginFlag == 0 then
+					lastToken := token
+			}
+		}
+	}
+end 
+
+# state 3 PROCEDURE
+procedure state3(string, tokenList, symbolTable)
+	token := ""					
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			" ":
+			{
+				if *token > 0 then
+					if token := "PROCEDURE" then
+						# write to tokenList
+						write(tokenList, left(token, 25) || "<PROCEDURE>")
+
+				token := ""
+			}
+
+			"{":
+			{
+				# if the token is not empty then we write to the symbol table and token list
+				if *token > 0 then
+				{
+					# increment the dsAddress
+					dsAddress := dsAddress + 2	
+
+					# write to tokenList
+					write(tokenList, left(token, 25) || "<ProcedureName>")
+
+					# write to symbolTable
+					write(symbolTable, left(token, 25) || left("<ProcedureName>", 25) || left("0", 10) || left(dsAddress, 10) || "DS")
+
+					# then write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+				}
+				else
+					# write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+
+				token := ""
+			}
+			
+			# we dont take in the ( and )
+			"(":
+			{
+			
+			}
+			
+			")":
+			{
+			
+			}
+			
+			default:
+				token := token || string[i]
+		}
+	}
+
+	if *token > 0 then
+	{	
+		# increment the dsAddress
+		dsAddress := dsAddress + 2	
+
+		# write to tokenList
+		write(tokenList, left(token, 25) || "<ProcedureName>")
+
+		# write to symbolTable
+		write(symbolTable, left(token, 25) || left("<ProcedureName>", 25) || left("0", 10) || left(dsAddress, 10) || "DS")
+	}
+end
+
+# state 4 WHILE
+procedure state4(string, tokenList, symbolTable)
+	token := ""
+
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					if token == "WHILE" then
+						write(tokenList, left(token, 25) || "<WHILE>")
+					else if token == "ODD" then
+						write(tokenList, left(token, 25) || "<ODD>")
+					else if token == "PUT" then
+						write(tokenList, left(token, 25) || "<PUT>")
+					else if token == "GET" then
+						write(tokenList, left(token, 25) || "<PUT>")
+					else
+						processToken(token, tokenList, symbolTable, 4)
+						
+					token := ""
+				}
+
+			"{":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 4)
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+					token := ""
+				}
+				
+			"}":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 4)
+					write(tokenList, left("}", 25) || "<RightBracket>")
+					token := ""
+				}
+				
+			"(":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 4)
+					write(tokenList, left("(", 25) || "<Delimiter>")
+					token := ""
+				}
+					
+			")":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 4)
+					write(tokenList, left(")", 25) || "<Delimiter>")
+					token := ""
+				}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable, 4)
+			
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# then write to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+	
+	# check if user didn't put the ;
+	if *token > 0 then
+		processToken(token, tokenList, symbolTable,	4)
+end
+
+# state 5 IF
+procedure state5(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					if token == "IF" then
+						write(tokenList, left(token, 25) || "<IF>")
+					else if token == "ODD" then
+						write(tokenList, left(token, 25) || "<ODD>")
+					else if token == "PUT" then
+						write(tokenList, left(token, 25) || "<PUT>")
+					else if token == "GET" then
+						write(tokenList, left(token, 25) || "<PUT>")
+					else
+						processToken(token, tokenList, symbolTable, 5)
+					token := ""
+				}
+			
+			"{":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 5)
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+					token := ""
+				}
+				
+			"}":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 5)
+					write(tokenList, left("}", 25) || "<RightBracket>")
+					token := ""
+				}
+				
+			"(":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 5)
+					write(tokenList, left("(", 25) || "<Delimiter>")
+					token := ""
+				}
+					
+			")":
+				{
+					if *token > 0 then
+						processToken(token, tokenList, symbolTable, 5)
+					write(tokenList, left(")", 25) || "<Delimiter>")
+					token := ""
+				}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable, 5)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+
+	# check if user didn't put the ;
+	if *token > 0 then
+		processToken(token, tokenList, symbolTable,	5)
+end
+
+# state 6 ELSE
+procedure state6(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 6)
+					token := ""
+				}
+
+			"{":
+			{
+				# if the token is not empty then we write to the symbol table and token list
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 6)
+
+					# then write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+				}
+				else
+					# write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+
+				token := ""
+			}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable,	6)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+end
+
+# state 7 CALL
+procedure state7(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 7)
+					token := ""
+				}
+
+			"{":
+			{
+				# if the token is not empty then we write to the symbol table and token list
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 7)
+
+					# then write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+				}
+				else
+					# write { to tokenList
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+
+				token := ""
+			}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable,	7)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+			
+			# we dont take in the ( and )
+			"(":
+			{
+			
+			}
+			
+			")":
+			{
+			
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+
+	# check if the user doesn't have a ;
+	if *token > 0 then
+		processToken(token, tokenList, symbolTable,	7)
+end
+
+# state 8 VAR
+procedure state8(string, tokenList, symbolTable)
+	token := ""			
+
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			" ":
+			{
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					if token ~== "VAR" then
+					{
+						# increment the dsAddress
+						dsAddress := dsAddress + 2	
+
+						# write to tokenList as $var
+						write(tokenList, left(token, 25) || "<$var>")
+						
+						# check if the token is already written in the symbol table
+						if ifExisted(token) == "false" then
+							# write to symbolTable as type VAR
+							write(symbolTable, left(token, 25) || left("<VAR>", 25) || left("0", 10) || left(dsAddress, 10) || "DS")
+					}
+					else
+						write(tokenList, left(token, 25) || "<VAR>")
+
+					# reset the token
+					token := ""
+				}
+			}
+
+			",":
+			{
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					if token ~== "VAR" then
+					{
+						# increment the dsAddress
+						dsAddress := dsAddress + 2		
+
+						# write to tokenList as $var
+						write(tokenList, left(token, 25) || "<$var>")
+
+						# check if the token is already written in the symbol table
+						if ifExisted(token) == "false" then
+							# write to symbolTable as type VAR
+							write(symbolTable, left(token, 25) || left("<VAR>", 25) || left("0", 10) || left(dsAddress, 10) || "DS")
+					}
+				}
+
+				# write the  ,
+				write(tokenList, left(",", 25) || "<Comma>")
+
+				# reset the token
+				token := ""
+			}
+
+			";":
+			{
+				# check if token is empty or not
+				if *token > 0 then
+				{
+					if token ~== "VAR" then
+					{
+						# increment the dsAddress
+						dsAddress := dsAddress + 2		
+
+						# write to tokenList as $var
+						write(tokenList, left(token, 25) || "<$var>")
+
+						# check if the token is already written in the symbol table
+						if ifExisted(token) == "false" then
+							# write to symbolTable as VAR
+							write(symbolTable, left(token, 25) || left("<VAR>", 25) || left("0", 10) || left(dsAddress, 10) || "DS")
+					}
+				}
+
+				# write the  ;
+				write(tokenList, left(";", 25) || "<Delimiter>")
+
+				assginFlag := 0
+
+				# reset the token
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+end
+
+# state 9 ODD
+procedure state9(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					if token == "ODD" then
+						write(tokenList, left(token, 25) || "<ODD>")
+					else
+						processToken(token, tokenList, symbolTable, 9)
+					token := ""
+				}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable,	9)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+end
+
+# state 10 no keyword 
+procedure state10(string, tokenList, symbolTable)
+	# scan to check if it is a comment
+	if index := find("/*", string) then
+	{
+		sliceString := slice(string, index, 2)
+		
+		if find("*/", sliceString) then
+			# ignore comment
+			pass		
+	}
+	# if not then process the token
+	else
+	{
+		token := ""
+
+		assginFlag := 0
+
+		every i := 1 to *string do
+		{
+			case string[i] of
+			{
+				"{":
+				{
+					if *token > 0 then
+					{
+						write(tokenList, left(token, 25) || "<$var>")
+						token := ""
+					}
+					write(tokenList, left("{", 25) || "<LeftBracket>")
+				}
+				
+				"}":
+				{
+					if *token > 0 then
+					{
+						write(tokenList, left(token, 25) || "<$var>")
+						token := ""
+					}
+					write(tokenList, left("}", 25) || "<RightBracket>")
+				}
+				
+				"(":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")
+						}	
+					}
+					write(tokenList, left("(", 25) || "<Delimiter>")
+					token := ""
+				}
+					
+				")":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")
+						}	
+					}
+					write(tokenList, left(")", 25) || "<Delimiter>")
+					token := ""
+				}
+				
+				" ":
+				{
+					if *token > 0 then
+					{
+						# check for assginFlag
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")
+						}	
+						else
+							write(tokenList, left(token, 25) || "<$var>")	
+					}
+
+					token := ""
+				}
+
+				"=":
+				{
+					assginFlag := 1
+
+					# write the  =
+					write(tokenList, left("=", 25) || "<$assign>")
+				}
+				
+				",":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")
+						}			
+					}
+
+					# write the  =
+					write(tokenList, left(",", 25) || "<Comma>")
+
+					token := ""
+				}
+
+				";":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")			
+						}				
+					}
+
+					# write the  =
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+					token := ""
+				}
+
+				"+":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+								
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")				
+						}	
+					}
+
+					# write the  +
+					write(tokenList, left("+", 25) || "<ADD>")
+
+					token := ""
+				}
+
+				"-":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")			
+						}
+					}
+
+					# write the  -
+					write(tokenList, left("-", 25) || "<ADD>")
+
+					token := ""
+				}
+
+				"*":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+								
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")		
+						}	
+					}
+
+					# write the *
+					write(tokenList, left("*", 25) || "<MULT>")
+					
+					token := ""
+				}
+
+				"/":
+				{
+					if *token > 0 then
+					{
+						if assginFlag == 1 then
+						{
+							# check for the type of the assignment
+							if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+							{								
+								# write to tokenList 
+								write(tokenList, left(token, 25) || checkType(token))
+
+								dsAddress := dsAddress + 2
+
+								# check if the token is already written in the symbol table
+								if ifExisted(token) == "false" then
+									# write to symbolTable
+									write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+							}
+							else
+								write(tokenList, left(token, 25) || "<$var>")			
+						}
+					}
+
+					# write the /
+					write(tokenList, left("/", 25) || "<MULT>")
+					
+					token := ""
+				}
+					
+				default:
+					token := token || string[i]
+			}
+		}
+
+		if *token > 0 then
+		{
+			# check for the type of the assignment
+			if checkType(token) == "<NumLit>" | checkType(token) == "<Lit>" then
+			{
+				# write to tokenList 
+				write(tokenList, left(token, 25) || checkType(token))
+
+				dsAddress := dsAddress + 2
+
+				# check if the token is already written in the symbol table
+				if ifExisted(token) == "false" then
+					# write to symbolTable
+					write(symbolTable, left(token, 25) || left(checkType(token), 25) || left(token, 10) || left(dsAddress, 10) || "DS")
+			}
+			else
+				write(tokenList, left(token, 25) || "<$var>")			
+		}
+	}
+end
+
+# state 11 GET input IO
+procedure state11(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 11)
+					token := ""
+				}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable,	11)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+end
+
+# state 12 PUT output IO
+procedure state12(string, tokenList, symbolTable)
+	token := ""
+	every i := 1 to *string do
+	{
+		case string[i] of
+		{
+			# generate error if there are a space 
+			" ":
+				# check if the token is not empty
+				if *token > 0 then
+				{
+					processToken(token, tokenList, symbolTable, 12)
+					token := ""
+				}
+
+			";":
+			{
+				if *token > 0 then	
+				{
+					processToken(token, tokenList, symbolTable,	12)
+
+					# then write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+				}
+				else
+					# write ; to tokenList
+					write(tokenList, left(";", 25) || "<Delimiter>")
+
+				token := ""
+			}
+
+			default:
+				token := token || string[i]
+		}
+	}
+end

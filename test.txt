@@ -1,0 +1,45 @@
+CLASS Pgm1
+{    
+    VAR ans, a, b, c, Bob, Jane, N;
+
+    GET a;
+    GET b;
+    GET c;
+    GET Bob;
+    GET Jane;
+
+    ans = a * ((Bob + Jane - 10) / 2 * 4) / (b + c);
+
+    PUT ans;
+
+    GET a;
+    GET b;
+    IF a > b THEN PUT a;
+
+    GET a;
+    GET b;
+    GET c;
+    IF a > b THEN
+    {
+        IF b > c THEN PUT a;
+    }
+
+    IF b > a THEN
+    {
+        IF a > c THEN PUT b;
+    }
+
+    IF c > a THEN
+    {
+        IF a > b THEN PUT c;
+    }
+
+    CONST A = 1;
+    GET N;
+    WHILE N > 0 DO
+    {
+        A = A * N;
+        N = N - 1;
+    }
+    PUT A;
+}

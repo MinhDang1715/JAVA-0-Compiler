@@ -1,0 +1,19 @@
+CLASS Pgm3
+{
+    VAR N, a;
+    
+    GET N;
+    a = 1;
+    PROCEDURE factorial()
+    {
+        IF N > 0 THEN
+        {
+            a = a * N;
+            N = N - 1;
+            CALL factorial();
+        }
+    }
+
+    CALL factorial();
+    PUT a;
+}
